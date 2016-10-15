@@ -29,14 +29,15 @@ sbb_long_long:
                 push            rdi
                 push            rsi
                 push            rcx
-
                 clc
 .loop:
                 mov             rax, [rsi]
                 lea             rsi, [rsi + 8]
-                mov             rdx, rax
-                sbb             rdx, [rdi]
-                mov             [rdi], rdx
+                ;mov             rdx, rax я не помню почему я так делал, но mov действительно лишний
+                ;sbb             rdx, [rdi]
+                ;mov             [rdi], rdx
+                sbb             rax, [rdi]
+                mov             [rdi], rx
                 lea             rdi, [rdi + 8]
                 dec             rcx
                 jnz             .loop
