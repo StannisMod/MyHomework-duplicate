@@ -37,7 +37,7 @@ sbb_long_long:
                 ;sbb             rdx, [rdi]
                 ;mov             [rdi], rdx
                 sbb             rax, [rdi]
-                mov             [rdi], rx
+                mov             [rdi], rax
                 lea             rdi, [rdi + 8]
                 dec             rcx
                 jnz             .loop
