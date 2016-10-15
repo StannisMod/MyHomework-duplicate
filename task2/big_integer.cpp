@@ -99,13 +99,17 @@ big_integer::big_integer(std::string const& str) {
 }
 
 big_integer& big_integer::operator=(big_integer const& other) {
-	if (other.arg == arg)
+	if (&other == (this))
 		return (*this);
-	delete[] arg;
-	size = 0;
-	set_sign(other.arg[other.size]);
 	resize(other.size);
+	if (other.size < size) {
+		delete[] arg;
+		arg = new uint32_t[other.capasity];
+		capasity = other.capasity;
+	}
+	size = other.size;
 	copy(other.arg, arg, 0, other.size);
+	reduce();
 	return (*this);
 }
 
@@ -519,24 +523,17 @@ std::string to_string(big_integer const& a) {
 	if (a == 0)
 		return "0";
 	big_integer tmp;
-	char *ans;
-	size_t n = 0, i = 0;
-	ans = new char[a.size * 10];
+	std::string s;
 	a.arg[a.size] == 1 ? tmp = -a : tmp = a;
 	uint32_t b;
 	while (tmp > 0) {
 		b = 10;
 		tmp = sdiv(tmp, b);
-		ans[i] = (char)(b + '0');
-		i++;
-		n++;
+		s.push_back((char)(b + '0'));
 	}
 	if (a.arg[a.size] == 1)
-		ans[n++] = '-';
-	for (i = 0; i < n - i - 1; i++)
-		std::swap(ans[i], ans[n - i - 1]);
-	std::string s(ans, n);
-	delete[] ans;
+		s.push_back('-');
+	std::reverse(std::begin(s), std::end(s));
 	return s;
 }
 
