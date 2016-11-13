@@ -122,6 +122,6 @@ int main() {
 	std::string k = "";
 	test1();
 	test2();
-	while (1);
+	//while (1);
 	return 0;
 }
