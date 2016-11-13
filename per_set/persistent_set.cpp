@@ -16,9 +16,9 @@ persistent_set::iterator persistent_set::find(persistent_set::value_type val) {
 	if (!bool(root))
 		return end();
 	auto tmp = root.get();
-	std::stack <node*> s;
+	std::vector <node*> s;
 	while (tmp->value != val) {
-		s.push(tmp);
+		s.push_back(tmp);
 		if (val < tmp->value && !bool(tmp->left) || val > tmp->value && !bool(tmp->right)) {
 			return end();
 		}
@@ -27,7 +27,7 @@ persistent_set::iterator persistent_set::find(persistent_set::value_type val) {
 		else
 			tmp = tmp->right.get();
 	}
-	s.push(tmp);
+	s.push_back(tmp);
 	persistent_set::iterator ans;
 	ans.root = root.get();
 	ans.path = s;
@@ -40,23 +40,23 @@ std::pair<persistent_set::iterator, bool> persistent_set::insert(persistent_set:
 		return std::make_pair(ans, false);
 	if (!bool(root)) {
 		root = std::make_shared <node> (node(val));
-		ans.path.push(root.get());
+		ans.path.push_back(root.get());
 		return std::make_pair(ans, true);
 	}
 	auto tmp = root.get();
-	std::stack <node*> s;
+	std::vector <node*> s;
 	while (val < tmp->value && bool(tmp->left) || val > tmp->value && bool(tmp->right)) {
-		s.push(tmp);
+		s.push_back(tmp);
 		if (val < tmp->value)
 			tmp = tmp->left.get();
 		else
 			tmp = tmp->right.get();
 	}
-	s.push(tmp);
+	s.push_back(tmp);
 	auto tmp2 = std::make_shared <node>(node(val));
 	while (!s.empty()) {
-		tmp = s.top();
-		s.pop();
+		tmp = s[s.size() - 1];
+		s.pop_back();
 		if (tmp2.get()->value < tmp->value)
 			tmp2 = std::make_shared <node>(tmp->value, tmp2, tmp->right);
 		else
@@ -72,17 +72,17 @@ void persistent_set::erase(persistent_set::iterator it) {
 	node* tmp;
 	value_type last_val = *it;
 	value_type del = *it;
-	auto tmp2 = it.path.top()->left;
-	if (bool(it.path.top()->right)) {
-		it.path.push(it.path.top()->right.get());
-		while (bool(it.path.top()->left))
-			it.path.push(it.path.top()->left.get());
-		tmp2 = std::make_shared <node>(it.path.top()->value, tmp2, it.path.top()->right);
-		it.path.pop();
+	auto tmp2 = it.path[it.path.size() - 1]->left;
+	if (bool(it.path[it.path.size() - 1]->right)) {
+		it.path.push_back(it.path[it.path.size() - 1]->right.get());
+		while (bool(it.path[it.path.size() - 1]->left))
+			it.path.push_back(it.path[it.path.size() - 1]->left.get());
+		tmp2 = std::make_shared <node>(it.path[it.path.size() - 1]->value, tmp2, it.path[it.path.size() - 1]->right);
+		it.path.pop_back();
 	}
 	while (!it.path.empty()) {
-		tmp = it.path.top();
-		it.path.pop();
+		tmp = it.path[it.path.size() - 1];
+		it.path.pop_back();
 		if (tmp->value == del)
 			continue;
 		if (last_val < tmp->value)
@@ -107,10 +107,10 @@ persistent_set::iterator persistent_set::begin() const{
 	ans.root = root.get();
 	node* tmp = root.get();
 	while (bool(tmp->left)) {
-		ans.path.push(tmp);
+		ans.path.push_back(tmp);
 		tmp = tmp->left.get();
 	}
-	ans.path.push(tmp);
+	ans.path.push_back(tmp);
 	return ans;
 }
 
@@ -131,27 +131,27 @@ persistent_set::node::node(value_type value, std::shared_ptr <node> left, std::s
 	value(value), left(left), right(right) {}
 
 persistent_set::value_type const& persistent_set::iterator::operator*() const {
-	return value_type(path.top()->value);
+	return value_type(path[path.size() - 1]->value);
 }
 
 persistent_set::iterator& persistent_set::iterator::operator++() {
 	if (path.empty()) {
-		path.push(root);
-		while (bool(path.top()->left))
-			path.push(path.top()->left.get());
+		path.push_back(root);
+		while (bool(path[path.size() - 1]->left))
+			path.push_back(path[path.size() - 1]->left.get());
 		return (*this);
 	}
-	if (bool(path.top()->right)) {
-		path.push(path.top()->right.get());
-		while (bool(path.top()->left))
-			path.push(path.top()->left.get());
+	if (bool(path[path.size() - 1]->right)) {
+		path.push_back(path[path.size() - 1]->right.get());
+		while (bool(path[path.size() - 1]->left))
+			path.push_back(path[path.size() - 1]->left.get());
 	}
 	else {
-		node* last = path.top();
-		path.pop();
-		while (!path.empty() && last == path.top()->right.get()) {
-			last = path.top();
-			path.pop();
+		node* last = path[path.size() - 1];
+		path.pop_back();
+		while (!path.empty() && last == path[path.size() - 1]->right.get()) {
+			last = path[path.size() - 1];
+			path.pop_back();
 		}
 	}
 	return (*this);
@@ -165,23 +165,23 @@ persistent_set::iterator persistent_set::iterator::operator++(int) {
 
 persistent_set::iterator& persistent_set::iterator::operator--() {
 	if (path.empty()) {
-		path.pop();
-		path.push(root);
-		while (bool(path.top()->right))
-			path.push(path.top()->right.get());
+		path.pop_back();
+		path.push_back(root);
+		while (bool(path[path.size() - 1]->right))
+			path.push_back(path[path.size() - 1]->right.get());
 		return (*this);
 	}
-	if (bool(path.top()->left)) {
-		path.push(path.top()->left.get());
-		while (bool(path.top()->right))
-			path.push(path.top()->right.get());
+	if (bool(path[path.size() - 1]->left)) {
+		path.push_back(path[path.size() - 1]->left.get());
+		while (bool(path[path.size() - 1]->right))
+			path.push_back(path[path.size() - 1]->right.get());
 	}
 	else {
-		node* last = path.top();
-		path.pop();
-		while (!path.empty() && last == path.top()->left.get()) {
-			last = path.top();
-			path.pop();
+		node* last = path[path.size() - 1];
+		path.pop_back();
+		while (!path.empty() && last == path[path.size() - 1]->left.get()) {
+			last = path[path.size() - 1];
+			path.pop_back();
 		}
 	}
 	return (*this);

@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <memory>
-#include <stack>
+#include <vector>
 
 struct persistent_set
 {
@@ -96,7 +96,7 @@ struct persistent_set::iterator
 
 		friend struct persistent_set;
 	private:
-		std::stack <node*> path;
+		std::vector <node*> path;
 		node* root;
 	};
 // Сравнение. Итераторы считаются эквивалентными если одни ссылаются на один и тот же элемент.
