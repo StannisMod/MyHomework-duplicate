@@ -67,21 +67,20 @@ std::pair<persistent_set::iterator, bool> persistent_set::insert(persistent_set:
 }
 
 void persistent_set::erase(persistent_set::iterator it) {
-	if (it == end())
+	if (it.path.empty())
 		return;
 	node* tmp;
-	value_type last_val = *it;
-	value_type del = *it;
-	auto tmp2 = it.path[it.path.size() - 1]->left;
-	if (bool(it.path[it.path.size() - 1]->right)) {
-		it.path.push_back(it.path[it.path.size() - 1]->right.get());
-		while (bool(it.path[it.path.size() - 1]->left))
-			it.path.push_back(it.path[it.path.size() - 1]->left.get());
-		tmp2 = std::make_shared <node>(it.path[it.path.size() - 1]->value, tmp2, it.path[it.path.size() - 1]->right);
+	value_type last_val = *it, del = *it;
+	auto tmp2 = it.top()->left;
+	if (bool(it.top()->right)) {
+		it.path.push_back(it.top()->right.get());
+		while (bool(it.top()->left))
+			it.path.push_back(it.top()->left.get());
+		tmp2 = std::make_shared <node>(it.top()->value, tmp2, it.top()->right);
 		it.path.pop_back();
 	}
 	while (!it.path.empty()) {
-		tmp = it.path[it.path.size() - 1];
+		tmp = it.top();
 		it.path.pop_back();
 		if (tmp->value == del)
 			continue;
@@ -129,6 +128,10 @@ persistent_set::node::node(value_type value) : value(value) {}
 
 persistent_set::node::node(value_type value, std::shared_ptr <node> left, std::shared_ptr <node> right) : 
 	value(value), left(left), right(right) {}
+
+persistent_set::node* persistent_set::iterator::top() {
+	return path[path.size() - 1];
+}
 
 persistent_set::value_type const& persistent_set::iterator::operator*() const {
 	return value_type(path[path.size() - 1]->value);

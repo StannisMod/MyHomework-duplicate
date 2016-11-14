@@ -2,6 +2,7 @@
 #include <random>
 #include <set>
 #include <time.h>
+#include <vld.h>
 
 void test1() {
 	persistent_set y;
@@ -19,7 +20,7 @@ void test1() {
 }
 
 void test2() {
-	const int N = 3000, MOD = 2000;
+	const int N = 300, MOD = 200;
 	persistent_set my_set, last_version[2 * N];
 	std::set <int> s[2 * N];
 	int t;
@@ -67,7 +68,7 @@ void test2() {
 }
 
 void test3() {
-	const int N = 3000, MOD = 2000;
+	const int N = 300, MOD = 200;
 	persistent_set my_set, last_version[2 * N];
 	std::set <int> s[2 * N];
 	int t;
@@ -122,6 +123,7 @@ int main() {
 	std::string k = "";
 	test1();
 	test2();
+	test3();
 	//while (1);
 	return 0;
 }
