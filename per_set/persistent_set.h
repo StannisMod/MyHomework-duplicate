@@ -55,13 +55,14 @@ struct persistent_set
 
 		node();
 		node(value_type);
-		node(value_type, std::shared_ptr <node>, std::shared_ptr <node>);
+        node(value_type, std::shared_ptr <node> left, std::shared_ptr <node> right);
 
 		friend struct persistent_set;
 		friend struct persistent_set::iterator;
 	private:
 		value_type value;
 		std::shared_ptr <node> left, right;
+
 	};
 
 private:

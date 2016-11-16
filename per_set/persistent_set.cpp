@@ -70,7 +70,8 @@ void persistent_set::erase(persistent_set::iterator it) {
 	if (it.path.empty())
 		return;
 	node* tmp;
-	value_type last_val = *it, del = *it;
+	auto last = it.top();
+	auto del = it.top();
 	auto tmp2 = it.top()->left;
 	if (bool(it.top()->right)) {
 		it.path.push_back(it.top()->right.get());
@@ -82,13 +83,13 @@ void persistent_set::erase(persistent_set::iterator it) {
 	while (!it.path.empty()) {
 		tmp = it.top();
 		it.path.pop_back();
-		if (tmp->value == del)
+		if (tmp == del)
 			continue;
-		if (last_val < tmp->value)
+		if (last->value < tmp->value)
 			tmp2 = std::make_shared <node>(tmp->value, tmp2, tmp->right);
 		else
 			tmp2 = std::make_shared <node>(tmp->value, tmp->left, tmp2);
-		last_val = tmp2.get()->value;
+		last = tmp2.get();
 	}
 	root = tmp2;
 }
@@ -134,7 +135,10 @@ persistent_set::node* persistent_set::iterator::top() {
 }
 
 persistent_set::value_type const& persistent_set::iterator::operator*() const {
-	return value_type(path[path.size() - 1]->value);
+	if (!path.empty())
+		return value_type(path[path.size() - 1]->value);
+	else
+		throw ":(";
 }
 
 persistent_set::iterator& persistent_set::iterator::operator++() {
