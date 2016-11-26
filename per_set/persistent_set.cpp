@@ -136,9 +136,9 @@ persistent_set::node* persistent_set::iterator::top() {
 
 persistent_set::value_type const& persistent_set::iterator::operator*() const {
 	if (!path.empty())
-		return value_type(path[path.size() - 1]->value);
+		return path[path.size() - 1]->value;
 	else
-		return value_type();
+		return NULL;
 }
 
 persistent_set::iterator& persistent_set::iterator::operator++() {
