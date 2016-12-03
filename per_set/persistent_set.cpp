@@ -1,6 +1,8 @@
 #include "persistent_set.h"
 #include <algorithm>
 
+const persistent_set::value_type NULL_VALUE = persistent_set::value_type();
+
 persistent_set::persistent_set() {}
 
 persistent_set::persistent_set(persistent_set const& other) : root(other.root) {}
@@ -138,7 +140,7 @@ persistent_set::value_type const& persistent_set::iterator::operator*() const {
 	if (!path.empty())
 		return path[path.size() - 1]->value;
 	else
-		return NULL;
+		return NULL_VALUE;
 }
 
 persistent_set::iterator& persistent_set::iterator::operator++() {
