@@ -174,7 +174,6 @@ persistent_set::iterator persistent_set::iterator::operator++(int) {
 
 persistent_set::iterator& persistent_set::iterator::operator--() {
 	if (path.empty()) {
-		path.pop_back();
 		path.push_back(root);
 		while (bool(path[path.size() - 1]->right))
 			path.push_back(path[path.size() - 1]->right.get());
